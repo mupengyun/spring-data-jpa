@@ -2077,6 +2077,24 @@ public class UserRepositoryTests {
 		assertThat(users).extracting(User::getId).containsExactly(expected.getId());
 	}
 
+	@Test //DATAJPA-1235
+	public void handlesEscapedColonsFollowedByIntegerInStringLiteral(){
+
+		String firstName = "aFirstName";
+
+		User expected = new User(firstName, "000:1", "something@something");
+		User notExpected = new User(firstName, "000\\:1", "something@something.else");
+
+		repository.save(expected);
+		repository.save(notExpected);
+
+		assertThat(repository.findAll()).hasSize(2);
+
+		List<User> users = repository.queryWithIndexedParameterAndEscapedColonFollowedByIntegerInString(firstName);
+
+		assertThat(users).extracting(User::getId).containsExactly(expected.getId());
+	}
+
 	private Page<User> executeSpecWithSort(Sort sort) {
 
 		flushTestUsers();
