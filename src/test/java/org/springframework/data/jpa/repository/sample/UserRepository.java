@@ -510,11 +510,11 @@ public interface UserRepository
 	NameOnly findByNativeQuery(Integer id);
 
 	// DATAJPA-1235
-	@Query("SELECT u FROM User u where u.firstname > ?1 and u.lastname = '000:1'")
+	@Query("SELECT u FROM User u where u.firstname = ?1 and u.lastname = '000:1'")
 	List<User> queryWithIndexedParameterAndColonFollowedByIntegerInString(String firstname);
 
 	// DATAJPA-1235
-	@Query("SELECT u FROM User u where u.firstname > ?1 and u.lastname = '000\\:1'")
+	@Query("SELECT u FROM User u where u.firstname = ?1 and u.lastname = '000\\:1'")
 	List<User> queryWithIndexedParameterAndEscapedColonFollowedByIntegerInString(String firstname);
 
 	static interface RolesAndFirstname {

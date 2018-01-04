@@ -254,7 +254,11 @@ class StringQuery {
 
 			}
 
-			return result;
+			return unescapeColons(result);
+		}
+
+		private String unescapeColons(String query) {
+			return query.replaceAll("\\\\:", ":");
 		}
 
 		private static String replaceFirst(String text, String substring, String replacement) {

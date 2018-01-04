@@ -31,7 +31,9 @@ import org.springframework.data.jpa.repository.query.StringQuery.ParameterBindin
 public class ParameterBindingParserUnitTests {
 
 	@Test // DATAJPA-1200
-	public void idenficationOfParameters() {
+	public void identifcationOfParameters() {
+
+		// arrows in comments mark dubious behavior that might not be what we want, but documents current behavior
 
 		SoftAssertions softly = new SoftAssertions();
 
@@ -60,19 +62,23 @@ public class ParameterBindingParserUnitTests {
 		checkHasParameter(softly, ":", false, "end of query");
 		checkHasParameter(softly, ":\u0003", false, "non-printable");
 		checkHasParameter(softly, ":\u002A", false, "basic latin emoji");
-		checkHasParameter(softly, "\\:", false, "escaped colon");
+		checkHasParameter(softly, "\\:", false, "escaped colon", ":");
 		checkHasParameter(softly, "::id", false, "double colon with identifier");
-		checkHasParameter(softly, "\\:id", false, "escaped colon with identifier");
+		checkHasParameter(softly, "\\:id", false, "escaped colon with identifier", ":id");
 
 		softly.assertAll();
 	}
 
-	public void checkHasParameter(SoftAssertions softly, String query, boolean containsParameter, String label) {
+	private void checkHasParameter(SoftAssertions softly, String query, boolean containsParameter, String label) {
+		checkHasParameter(softly, query, containsParameter, label, query);
+	}
+	private void checkHasParameter(SoftAssertions softly, String query, boolean containsParameter, String label, String expectedcleanedQuery) {
 
 		List<ParameterBinding> bindings = new ArrayList<>();
-		ParameterBindingParser.INSTANCE.parseParameterBindingsOfQueryIntoBindingsAndReturnCleanedQuery(query, bindings);
+		String cleanedQuery = ParameterBindingParser.INSTANCE.parseParameterBindingsOfQueryIntoBindingsAndReturnCleanedQuery(query, bindings);
 		softly.assertThat(bindings.size()) //
 				.describedAs(String.format("<%s> (%s)", query, label)) //
 				.isEqualTo(containsParameter ? 1 : 0);
+		softly.assertThat(cleanedQuery).describedAs(String.format("cleaned query for <%s> (%s)", query, label)).isEqualTo(expectedcleanedQuery);
 	}
 }
